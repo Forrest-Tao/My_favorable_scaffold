@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"go.uber.org/zap"
+	"imitation_go-project-demo/controller"
 	"imitation_go-project-demo/dao/mysql"
-	"imitation_go-project-demo/dao/redis"
 	"imitation_go-project-demo/logger"
 	"imitation_go-project-demo/pkg/snowflake"
 	"imitation_go-project-demo/router"
@@ -19,11 +19,11 @@ import (
 )
 
 func main() {
-	//config init
+	//1.config init
 	if err := setting.Init(); err != nil {
 		fmt.Printf("setting.Init() failed %v\n", err)
 	}
-	//logger init
+	//2.logger init
 	if err := logger.Init(setting.Conf.LogConfig); err != nil {
 		fmt.Printf("logger.Init(setting.Conf.LogConfig) failed %v\n", err)
 	}
@@ -34,22 +34,26 @@ func main() {
 			return
 		}
 	}(zap.L())
-	//mysql
+	//3.mysql
 	if err := mysql.Init(setting.Conf.MysqlConfig); err != nil {
 		zap.L().Fatal("mysql.Init() failed ", zap.Error(err))
 		return
 	}
-	//redis
-	if err := redis.Init(setting.Conf.RedisConfig); err != nil {
+	//4.redis
+	/*if err := redis.Init(setting.Conf.RedisConfig); err != nil {
 		zap.L().Fatal("redis.Init() failed ", zap.Error(err))
 		return
-	}
-
+	}*/
+	//
 	if err := snowflake.Init(setting.Conf.SnowFlakeConfig.StartTime, setting.Conf.SnowFlakeConfig.MachineID); err != nil {
-		fmt.Printf("init snowflake failed, err: %v\n", err)
+		zap.L().Fatal("snowflake.Init() failed ", zap.Error(err))
 		return
 	}
-
+	// 初始化 gin 框架内置的翻译器
+	if err := controller.InitTrans("zh"); err != nil {
+		zap.L().Fatal("controller.InitTrans() failed ", zap.Error(err))
+		return
+	}
 	// 5. 注册路由
 	r := router.Setup()
 	// 6. 启动服务（优雅关机）
