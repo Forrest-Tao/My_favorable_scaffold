@@ -1,12 +1,3 @@
-/*
-   @Author: StudentCWZ
-   @Description:
-   @File: snowflake
-   @Software: GoLand
-   @Project: GoWeb
-   @Date: 2022/3/17 14:31
-*/
-
 package snowflake
 
 import (
